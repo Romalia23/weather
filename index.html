@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #weather {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Weather Checker</h1>
+  <input type="text" id="city" placeholder="Enter city name" />
+  <button onclick="getWeather()">Get Weather</button>
+
+  <div id="weather"></div>
+
+  <script>
+    function getWeather() {
+      const city = document.getElementById('city').value;
+      const apiKey = 'YOUR_API_KEY_HERE'; // <-- Replace with your WeatherAPI key
+      const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}`;
+
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('City not found or API limit reached');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const weatherDiv = document.getElementById('weather');
+          weatherDiv.innerHTML = `
+            <h2>Weather in ${data.location.name}, ${data.location.country}</h2>
+            <p><strong>Temperature:</strong> ${data.current.temp_c}°C</p>
+            <p><strong>Condition:</strong> ${data.current.condition.text}</p>
+            <img src="https:${data.current.condition.icon}" alt="Weather icon">
+          `;
+        })
+        .catch(error => {
+          document.getElementById('weather').innerHTML = `<p style="color: red;">${error.message}</p>`;
+        });
+    }
+  </script>
+</body>
+</html>
