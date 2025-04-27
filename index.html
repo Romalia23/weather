@@ -1,51 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Weather App</title>
+  <title>Weather Checker</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    #weather {
-      margin-top: 20px;
-    }
+    body { font-family: Arial; text-align: center; padding: 50px; }
+    input { padding: 8px; }
   </style>
 </head>
 <body>
   <h1>Weather Checker</h1>
-  <input type="text" id="city" placeholder="Enter city name" />
-  <button onclick="getWeather()">Get Weather</button>
+  <input type="text" id="cityInput" placeholder="Enter city" />
+  <button onclick="getWeather()">Check</button>
+  <div id="weatherResult"></div>
+<script>
 
-  <div id="weather"></div>
+  async function getWeather() {
+  const city = document.getElementById('cityInput').value;
+  const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
-  <script>
-    function getWeather() {
-      const city = document.getElementById('city').value;
-      const apiKey = 'YOUR_API_KEY_HERE'; // <-- Replace with your WeatherAPI key
-      const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-      fetch(url)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('City not found or API limit reached');
-          }
-          return response.json();
-        })
-        .then(data => {
-          const weatherDiv = document.getElementById('weather');
-          weatherDiv.innerHTML = `
-            <h2>Weather in ${data.location.name}, ${data.location.country}</h2>
-            <p><strong>Temperature:</strong> ${data.current.temp_c}°C</p>
-            <p><strong>Condition:</strong> ${data.current.condition.text}</p>
-            <img src="https:${data.current.condition.icon}" alt="Weather icon">
-          `;
-        })
-        .catch(error => {
-          document.getElementById('weather').innerHTML = `<p style="color: red;">${error.message}</p>`;
-        });
+    if (data.cod === 200) {
+      const weatherInfo = `
+        <h2>${data.name}</h2>
+        <p>Temperature: ${data.main.temp}°C</p>
+        <p>Condition: ${data.weather[0].description}</p>
+      `;
+      document.getElementById('weatherResult').innerHTML = weatherInfo;
+    } else {
+      document.getElementById('weatherResult').innerHTML = `<p>City not found!</p>`;
     }
-  </script>
+  } catch (error) {
+    document.getElementById('weatherResult').innerHTML = `<p>Error fetching weather data.</p>`;
+  }
+}
+</script>
+ 
 </body>
 </html>
+
+ 
